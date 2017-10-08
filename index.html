@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>API FILM SEARCH</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+    body {
+        background: #E3E3E3;
+    }
+
+    h1 {
+        font-size: 48px;
+        text-align: center;
+        color: #0E272A;
+    }
+
+    th,
+    label {
+        color: #0E272A;
+        font-size: 24px;
+    }
+
+    button {
+      font-size: 16px;
+      border: 2px;
+      background: #0E272A;
+      color: #E3E3E3;
+      margin: 5px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>FILM API DATABASE</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Movie Name</th>
+                    <th>Year</th>
+                    <th>Plot</th>
+                    <th>Rating</th>
+                    <th>IMDB Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <!-- Example Movie 1 -->
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container">
+        <!-- We'll be dumping our JSON contents in here -->
+        <div id="movie-view"></div>
+        <!-- This form will be where users input data about the movies -->
+        <form id="movie-form">
+            <label for="movie-input">Search for a movie</label>
+            <input type="text" id="movie-input">
+            <br>
+            <!-- This button will trigger our AJAX call -->
+            <input id="find-movie" type="submit" value="Movie Search">
+        </form>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript">
+        // This .on("click") function will trigger the AJAX Call
+        var movies = [];
+        $("#find-movie").on("click", function(event) {
+
+            // Preventing the submit button from trying to submit the form
+            // We're optionally using a form so the user may hit Enter to search instead of clicking the button
+            event.preventDefault();
+
+            // Here we grab the text from the input box
+            var movie = $("#movie-input").val();
+            movies.push(movie);
+
+            // Here we construct our URL
+            var queryURL = "https://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=40e9cece";
+            // CODE GOES HERE
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).done(function(response) {
+                console.log(response);
+
+                var firstRowTds = $("table") // Get a reference to the table as a jQuery object
+                    .children() // Get all of table's immediate children as an array
+                    .eq(1) // Get element at the first index of this returned array (the <tbody>)
+                    .children("tr") // Get an array of all <tr> children inside the returned <tbody>
+                    .eq(0) // Get the 0th child of this returned array (the first <tr>)
+                    .children("td"); // Get an array of all <td> children inside the returned <tr>
+
+                // Setting the inner text of each <td> in the firstRowTds array
+                firstRowTds.eq(0).text(response.Title);
+
+                firstRowTds.eq(1).text(response.Year);
+
+                firstRowTds.eq(2).text(response.Plot);
+
+                firstRowTds.eq(3).text(response.Rated);
+
+                firstRowTds.eq(4).text(response.imdbRating);
+                renderButtons();
+            });
+        });
+
+
+
+        function renderButtons() {
+            $("#movie-view").empty();
+
+            // Looping through the array of movies
+            for (var i = 0; i < movies.length; i++) {
+                var a = $("<button>");
+                // Adding a class
+                a.addClass("movie");
+                // Adding a data-attribute with a value of the movie at index i
+                a.attr("data-name", movies[i]);
+                // Providing the button's text with a value of the movie at index i
+                a.text(movies[i]);
+                // Adding the button to the HTML
+                $("#movie-view").append(a);
+            }
+        }
+        $("#find-movie").on("click", function(event) {
+            event.preventDefault();
+            var movie = $("#movie-input").val().trim();
+            
+
+            renderButtons();
+        });
+
+
+
+        // =================================================================
+        </script>
+    </div>
+</body>
+
+</html>
